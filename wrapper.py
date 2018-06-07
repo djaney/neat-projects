@@ -1,5 +1,6 @@
 import neat
 
+
 class Neat:
     def __init__(self, name, config_file):
         self.name = name
@@ -16,7 +17,6 @@ class Neat:
         self.population.add_reporter(neat.Checkpointer(5, filename_prefix='checkpoints/' + self.name + '-'))
 
     def train(self, generations):
-
         self.winner = self.population.run(self.eval_genomes, generations)
         return self.winner
 
