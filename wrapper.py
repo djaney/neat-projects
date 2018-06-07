@@ -10,19 +10,16 @@ class Neat:
         self.config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                                   neat.DefaultSpeciesSet, neat.DefaultStagnation,
                                   config_file)
-        self.population = neat.Population(self.config)
         self.winner = None
-
-    def train(self, generations):
-        # Load configuration.
-
-        # Create the population, which is the top-level object for a NEAT run.
+        self.population = neat.Population(self.config)
 
         # Add a stdout reporter to show progress in the terminal.
         self.population.add_reporter(neat.StdOutReporter(True))
         stats = neat.StatisticsReporter()
         self.population.add_reporter(stats)
         self.population.add_reporter(neat.Checkpointer(5))
+
+    def train(self, generations):
 
         self.winner = self.population.run(self.eval_genomes, generations)
 
