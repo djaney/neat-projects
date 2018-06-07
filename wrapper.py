@@ -1,8 +1,4 @@
 import neat
-import graphviz
-import warnings
-import copy
-
 
 class Neat:
     def __init__(self, name, config_file):
