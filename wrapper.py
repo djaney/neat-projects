@@ -2,13 +2,16 @@ import neat
 
 
 class Neat:
-    def __init__(self, name, config_file):
+    def __init__(self, name, config_file, checkpoint=None):
         self.name = name
         self.config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                                   neat.DefaultSpeciesSet, neat.DefaultStagnation,
                                   config_file)
         self.winner = None
-        self.population = neat.Population(self.config)
+        if checkpoint is None:
+            self.population = neat.Population(self.config)
+        else:
+            self.population = neat.Checkpointer.restore_checkpoint('checkpoints/' + checkpoint)
 
         # Add a stdout reporter to show progress in the terminal.
         self.population.add_reporter(neat.StdOutReporter(True))

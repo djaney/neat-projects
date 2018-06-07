@@ -2,6 +2,7 @@ import os
 import gym
 import numpy as np
 import wrapper
+import argparse
 
 NAME = 'pole'
 GENERATIONS = 10
@@ -38,16 +39,24 @@ class PoleNeat(wrapper.Neat):
                 ob = env.reset()
 
 
-def main():
+def main(args):
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, 'pole.ini'.format(NAME))
 
-    w = PoleNeat('pole', config_path)
+    if args.checkpoint:
+        w = PoleNeat('pole', config_path, checkpoint=args.checkpoint)
+    else:
+        w = PoleNeat('pole', config_path)
 
-    w.train(300)
-
-    w.play()
+    if args.command == "train":
+        w.train(args.generations)
+    elif args.command == "play":
+        w.play()
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('command')
+    parser.add_argument('--checkpoint')
+    parser.add_argument('--generations', default=300)
+    main(parser.parse_args())
