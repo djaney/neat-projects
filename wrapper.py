@@ -1,5 +1,5 @@
 import neat
-from neat.six_util import itervalues
+
 
 class Neat:
     def __init__(self, name, config_file, checkpoint=None):
@@ -12,13 +12,6 @@ class Neat:
             self.population = neat.Population(self.config)
         else:
             self.population = neat.Checkpointer.restore_checkpoint('checkpoints/' + checkpoint)
-            # Gather and report statistics.
-            best = None
-            for g in itervalues(self.population.population):
-                if best is None or best.fitness is None or g.fitness is None or g.fitness > best.fitness:
-                    best = g
-
-            self.winner = best
 
         # Add a stdout reporter to show progress in the terminal.
         self.population.add_reporter(neat.StdOutReporter(True))

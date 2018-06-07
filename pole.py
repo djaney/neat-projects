@@ -51,6 +51,7 @@ def main(args):
     if args.command == "train":
         w.train(args.generations)
     elif args.command == "play":
+        w.train(1)
         w.play()
 
 
