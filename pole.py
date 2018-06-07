@@ -1,69 +1,52 @@
-import neat
 import os
 import gym
 import numpy as np
+import wrapper
 
 NAME = 'pole'
+GENERATIONS = 10
 
 
-def eval_genomes(genomes, config):
-    env = gym.make('LunarLanderContinuous-v2')
+class PoleNeat(wrapper.Neat):
+    def eval_genomes(self, genomes, config):
+        env = gym.make('LunarLanderContinuous-v2')
 
-    for genome_id, genome in genomes:
-        net = neat.nn.FeedForwardNetwork.create(genome, config)
+        for genome_id, genome in genomes:
+            net = self.create_net(genome)
+
+            ob = env.reset()
+            reward_sum = 0
+            while True:
+                action = net.activate(ob)
+                ob, reward, done, info = env.step(np.array(action))
+                reward_sum = reward_sum + reward
+                if done:
+                    break
+                genome.fitness = reward_sum
+
+    def play(self):
+        env = gym.make('LunarLanderContinuous-v2')
+
+        winner_net = self.create_net(self.winner)
 
         ob = env.reset()
-        reward_sum = 0
         while True:
-            action = net.activate(ob)
+            action = winner_net.activate(ob)
             ob, reward, done, info = env.step(np.array(action))
-            reward_sum = reward_sum + reward
+            env.render()
             if done:
-                break
-            genome.fitness = reward_sum
+                ob = env.reset()
 
 
-def run(config_file):
-    # Load configuration.
-    config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
-                         neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                         config_file)
+def main():
+    local_dir = os.path.dirname(__file__)
+    config_path = os.path.join(local_dir, 'pole.ini'.format(NAME))
 
-    # Create the population, which is the top-level object for a NEAT run.
-    p = neat.Population(config)
+    w = PoleNeat('pole', config_path)
 
-    # Add a stdout reporter to show progress in the terminal.
-    p.add_reporter(neat.StdOutReporter(True))
-    stats = neat.StatisticsReporter()
-    p.add_reporter(stats)
-    p.add_reporter(neat.Checkpointer(5))
-
-    # Run for up to 300 generations.
-    winner = p.run(eval_genomes, 300)
-
-    # Display the winning genome.
-    play(winner, config)
-
-
-def play(winner, config):
-    env = gym.make('LunarLanderContinuous-v2')
-
-    winner_net = neat.nn.FeedForwardNetwork.create(winner, config)
-
-    ob = env.reset()
-    reward_sum = 0
-    while True:
-        action = winner_net.activate(ob)
-        ob, reward, done, info = env.step(np.array(action))
-        reward_sum = reward_sum + reward
-        if done:
-            break
+    w.train(300)
+    w.play()
 
 
 if __name__ == '__main__':
-    # Determine path to configuration file. This path manipulation is
-    # here so that the script will run successfully regardless of the
-    # current working directory.
-    local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, '{}.ini'.format(NAME))
-    run(config_path)
+    main()
