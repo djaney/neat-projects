@@ -44,7 +44,9 @@ def main():
 
     w = PoleNeat('pole', config_path)
 
-    w.train(300)
+    winner = w.train(300)
+    print(winner.fitness)
+
     w.play()
 
 

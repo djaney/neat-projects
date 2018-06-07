@@ -17,13 +17,12 @@ class Neat:
         self.population.add_reporter(neat.StdOutReporter(True))
         stats = neat.StatisticsReporter()
         self.population.add_reporter(stats)
-        self.population.add_reporter(neat.Checkpointer(5))
+        self.population.add_reporter(neat.Checkpointer(5, filename_prefix=self.name + '-'))
 
     def train(self, generations):
 
         self.winner = self.population.run(self.eval_genomes, generations)
-
-        print('\nBest genome:\n{!s}'.format(self.winner))
+        return self.winner
 
     def create_net(self, genome):
         return neat.nn.FeedForwardNetwork.create(genome, self.config)
