@@ -25,10 +25,10 @@ class PoleNeat(wrapper.Neat):
                     break
                 genome.fitness = reward_sum
 
-    def play(self):
+    def play_winner(self, winner):
         env = gym.make('LunarLanderContinuous-v2')
 
-        winner_net = self.create_net(self.winner)
+        winner_net = self.create_net(winner)
 
         ob = env.reset()
         while True:
@@ -51,7 +51,6 @@ def main(args):
     if args.command == "train":
         w.train(args.generations)
     elif args.command == "play":
-        w.train(1)
         w.play()
 
 
