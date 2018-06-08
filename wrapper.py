@@ -13,7 +13,7 @@ class SaveWinner(neat.reporting.BaseReporter):
 
 
 class Neat:
-    def __init__(self, name, config_file, checkpoint=None):
+    def __init__(self, name, config_file, checkpoint=None, checkpoint_interval=20):
         self.name = name
         self.config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                                   neat.DefaultSpeciesSet, neat.DefaultStagnation,
@@ -32,7 +32,7 @@ class Neat:
         self.population.add_reporter(neat.StdOutReporter(True))
         stats = neat.StatisticsReporter()
         self.population.add_reporter(stats)
-        self.population.add_reporter(neat.Checkpointer(5, filename_prefix=self.checkpoint_filename))
+        self.population.add_reporter(neat.Checkpointer(checkpoint_interval, filename_prefix=self.checkpoint_filename))
         self.population.add_reporter(SaveWinner(self.best_filename))
 
     def train(self, generations):

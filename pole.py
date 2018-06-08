@@ -44,7 +44,7 @@ def main(args):
     config_path = os.path.join(local_dir, 'pole.ini'.format(NAME))
 
     if args.checkpoint:
-        w = PoleNeat('pole', config_path, checkpoint=args.checkpoint)
+        w = PoleNeat('pole', config_path, checkpoint=args.checkpoint, checkpoint_interval=args.save_interval)
     else:
         w = PoleNeat('pole', config_path)
 
@@ -59,4 +59,5 @@ if __name__ == '__main__':
     parser.add_argument('command')
     parser.add_argument('--checkpoint')
     parser.add_argument('--generations', default=300)
+    parser.add_argument('--save_interval', default=20)
     main(parser.parse_args())
