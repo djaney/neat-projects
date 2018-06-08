@@ -26,7 +26,7 @@ class Neat:
         if checkpoint is None:
             self.population = neat.Population(self.config)
         else:
-            self.population = neat.Checkpointer.restore_checkpoint('checkpoints/' + checkpoint)
+            self.population = neat.Checkpointer.restore_checkpoint(self.checkpoint_filename + checkpoint)
 
         # Add a stdout reporter to show progress in the terminal.
         self.population.add_reporter(neat.StdOutReporter(True))
