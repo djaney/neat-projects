@@ -8,7 +8,7 @@ NAME = 'pole'
 GENERATIONS = 10
 
 
-class PoleNeat(wrapper.Neat):
+class PoleNeat(wrapper.NeatWrapper):
     def eval_genomes(self, genomes, config):
         env = gym.make('LunarLanderContinuous-v2')
 
