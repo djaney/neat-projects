@@ -58,6 +58,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('command')
     parser.add_argument('--checkpoint')
-    parser.add_argument('--generations', default=300)
+    parser.add_argument('--generations', default=300, type=int)
     parser.add_argument('--save_interval', default=20)
     main(parser.parse_args())
