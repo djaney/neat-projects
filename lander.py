@@ -4,7 +4,7 @@ import numpy as np
 import wrapper
 import argparse
 
-NAME = 'pole'
+NAME = 'lander'
 GENERATIONS = 10
 
 
@@ -22,8 +22,8 @@ class PoleNeat(wrapper.NeatWrapper):
                 ob, reward, done, info = env.step(np.array(action))
                 reward_sum = reward_sum + reward
                 if done:
+                    genome.fitness = reward_sum
                     break
-                genome.fitness = reward_sum
 
     def play_winner(self, winner):
         env = gym.make('LunarLanderContinuous-v2')
@@ -41,7 +41,7 @@ class PoleNeat(wrapper.NeatWrapper):
 
 def main(args):
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'pole.ini'.format(NAME))
+    config_path = os.path.join(local_dir, '{}.ini'.format(NAME))
 
     if args.checkpoint:
         w = PoleNeat('pole', config_path, checkpoint=args.checkpoint, checkpoint_interval=args.save_interval)
