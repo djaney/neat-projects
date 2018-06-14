@@ -22,8 +22,8 @@ class PoleNeat(wrapper.NeatWrapper):
                 ob, reward, done, info = env.step(np.array(action))
                 reward_sum = reward_sum + reward
                 if done:
-                    genome.fitness = reward_sum
                     break
+            genome.fitness = reward_sum
 
     def play_winner(self, winner):
         env = gym.make('LunarLanderContinuous-v2')
