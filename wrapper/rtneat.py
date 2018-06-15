@@ -11,7 +11,7 @@ class IntervalThread(threading.Thread):
         self.threaded_function = threaded_function
 
     def run(self):
-        while not self.stopped.wait(1):
+        while not self.stopped.wait(0.1):
             self.threaded_function()
 
 
@@ -21,8 +21,7 @@ class RtNeat(Neat):
 
     def __init__(self, name, config_file):
         super().__init__(name, config_file)
-        self.rt_stop_flag = threading.Event()
-        self.rt_daemon = IntervalThread(self.rt_stop_flag, self.__get_rt_iterate_function())
+        self.build_population_nn()
 
     def eval_genomes(self, genomes, config):
         pass
@@ -37,9 +36,9 @@ class RtNeat(Neat):
         self.rt_population_nn = nn
 
     def __get_rt_iterate_function(self):
-        return lambda: self.__rt_iterate()
+        return lambda: self.rt_iterate()
 
-    def __rt_iterate(self):
+    def rt_iterate(self):
         self.population.reporters.start_generation(self.population.generation)
 
         # Gather and report statistics.
@@ -59,8 +58,8 @@ class RtNeat(Neat):
                 worst = g
 
         population_with_fitness = dict([p for p in iteritems(self.population.population) if p[1].fitness is not None])
-        # if population_with_fitness:
-        #     self.population.reporters.post_evaluate(self.config, population_with_fitness, self.population.species, best)
+        if population_with_fitness:
+            self.population.reporters.post_evaluate(self.config, population_with_fitness, self.population.species, best)
 
         # Track the best genome ever seen.
         if self.population.best_genome is None or best.fitness > self.population.best_genome.fitness:
@@ -90,21 +89,13 @@ class RtNeat(Neat):
             self.population.species.speciate(self.population.config, population_with_fitness,
                                              self.population.generation)
 
-        self.population.reporters.end_generation(self.population.config, self.population.population,
-                                                 self.population.species)
+        # self.population.reporters.end_generation(self.population.config, self.population.population,
+        #                                          self.population.species)
 
         self.population.generation += 1
 
-        if self.population.config.no_fitness_termination:
-            self.population.reporters.found_solution(self.population.config, self.population.generation, self.population.best_genome)
-
-    def rt_start(self):
-        self.build_population_nn()
-        self.rt_stop_flag.clear()
-        self.rt_daemon.start()
-
-    def rt_stop(self):
-        self.rt_stop_flag.set()
+        # if self.population.config.no_fitness_termination:
+        #     self.population.reporters.found_solution(self.population.config, self.population.generation, self.population.best_genome)
 
     def rt_get_population_ids(self):
         return list(iterkeys(self.population.population))
@@ -114,6 +105,8 @@ class RtNeat(Neat):
 
         if genome is not None:
             return genome.activate(inputs)
+        else:
+            return None
 
     def rt_set_fitness(self, genome_id, fitness):
         genome = self.population.population.get(genome_id)

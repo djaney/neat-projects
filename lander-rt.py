@@ -33,23 +33,25 @@ def main(args):
         w = LanderRtNeat(NAME, config_path)
 
     if args.command == "train":
-        try:
-            w.rt_start()
-            env = gym.make('LunarLanderContinuous-v2')
-            while True:
-                for genome_id in w.rt_get_population_ids():
-                    ob = env.reset()
-                    reward_total = 0
-                    while True:
-                        action = w.rt_activate(genome_id, ob)
-                        ob, reward, done, info = env.step(np.array(action))
-                        reward_total = reward_total + reward
-                        if done:
-                            break
-                    w.rt_set_fitness(genome_id, reward_total)
 
-        except KeyboardInterrupt:
-            w.rt_stop()
+        env = gym.make('LunarLanderContinuous-v2')
+        while True:
+            for genome_id in w.rt_get_population_ids():
+                ob = env.reset()
+                reward_total = 0
+                while True:
+                    action = w.rt_activate(genome_id, ob)
+                    if action is None:
+                        break
+                    ob, reward, done, info = env.step(np.array(action))
+                    reward_total = reward_total + reward
+                    if done:
+                        w.rt_set_fitness(genome_id, reward_total)
+                        break
+
+            w.rt_iterate()
+
+
 
     elif args.command == "play":
         w.play()
