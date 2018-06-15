@@ -48,7 +48,7 @@ class Neat:
     def play(self):
         with gzip.open(self.best_filename) as f:
             winner = pickle.load(f)
-
+        print('Playing winner with fitness {}'.format(winner.fitness))
         self.play_winner(winner)
 
     def play_winner(self, winner):
