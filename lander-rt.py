@@ -3,28 +3,12 @@ import gym
 import numpy as np
 import wrapper
 import argparse
-
-NAME = 'lander'
+import time
+NAME = 'lander-rt'
 GENERATIONS = 10
 
 
-class PoleNeat(wrapper.NeatWrapper):
-    def eval_genomes(self, genomes, config):
-        env = gym.make('LunarLanderContinuous-v2')
-
-        for genome_id, genome in genomes:
-            net = self.create_net(genome)
-
-            ob = env.reset()
-            reward_sum = 0
-            while True:
-                action = net.activate(ob)
-                ob, reward, done, info = env.step(np.array(action))
-                reward_sum = reward_sum + reward
-                if done:
-                    break
-            genome.fitness = reward_sum
-
+class LanderRtNeat(wrapper.RtNeatWrapper):
     def play_winner(self, winner):
         env = gym.make('LunarLanderContinuous-v2')
 
@@ -44,12 +28,29 @@ def main(args):
     config_path = os.path.join(local_dir, '{}.ini'.format(NAME))
 
     if args.checkpoint:
-        w = PoleNeat(NAME, config_path, checkpoint=args.checkpoint, checkpoint_interval=args.save_interval)
+        w = LanderRtNeat(NAME, config_path, checkpoint=args.checkpoint, checkpoint_interval=args.save_interval)
     else:
-        w = PoleNeat(NAME, config_path)
+        w = LanderRtNeat(NAME, config_path)
 
     if args.command == "train":
-        w.train(args.generations)
+        try:
+            w.rt_start()
+            env = gym.make('LunarLanderContinuous-v2')
+            while True:
+                for genome_id in w.rt_get_population_ids():
+                    ob = env.reset()
+                    reward_total = 0
+                    while True:
+                        action = w.rt_activate(genome_id, ob)
+                        ob, reward, done, info = env.step(np.array(action))
+                        reward_total = reward_total + reward
+                        if done:
+                            break
+                    w.rt_set_fitness(genome_id, reward_total)
+
+        except KeyboardInterrupt:
+            w.rt_stop()
+
     elif args.command == "play":
         w.play()
 
