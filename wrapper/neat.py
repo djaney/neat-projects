@@ -1,7 +1,8 @@
 import neat
 import pickle
 import gzip
-
+import socket
+import sys
 
 class SaveWinner(neat.reporting.BaseReporter):
     def __init__(self, filename):
@@ -53,3 +54,30 @@ class Neat:
 
     def play_winner(self, winner):
         raise NotImplemented()
+
+    def serve(self, host='localhost', port=9999, message_size=4096):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        server_address = (host, port)
+        print('starting up on {} port {}'.format(*server_address))
+        sock.bind(server_address)
+
+        while True:
+            print('\nwaiting to receive message')
+            data, address = sock.recvfrom(message_size)
+            data = data.decode('utf-8')
+            input_arr = data.split(' ')
+            cmd = input_arr[0]
+            params = input_arr[1:]
+
+            # return population indexes
+            if 'pop' == cmd:
+                self.send(sock, ' '.join([str(s) for s in self.population.population.keys()]), address)
+            if 'act' == cmd:
+                winner_net = self.create_net(self.population.population.get(int(params[0])))
+                inputs = [float(i) for i in params[1].split(',')]
+                self.send(sock, ' '.join([str(s) for s in winner_net.activate(inputs)]), address)
+            else:
+                pass
+
+    def send(self, sock, data, address):
+        return sock.sendto(data.encode('utf-8'), address)

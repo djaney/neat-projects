@@ -49,7 +49,7 @@ def main(args):
         w = PoleNeat(NAME, config_path)
 
     if args.command == "train":
-        w.train(args.generations)
+        w.serve()
     elif args.command == "play":
         w.play()
 
