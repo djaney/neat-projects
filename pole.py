@@ -10,20 +10,7 @@ GENERATIONS = 10
 
 class PoleNeat(wrapper.NeatWrapper):
     def eval_genomes(self, genomes, config):
-        env = gym.make('CartPole-v1')
-
-        for genome_id, genome in genomes:
-            net = self.create_net(genome)
-
-            ob = env.reset()
-            reward_sum = 0
-            while True:
-                action = net.activate(ob)
-                ob, reward, done, info = env.step(np.argmax(action))
-                reward_sum += reward
-                if done:
-                    break
-            genome.fitness = reward_sum
+        pass
 
     def play_winner(self, winner):
         env = gym.make('CartPole-v1')

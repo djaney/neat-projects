@@ -61,12 +61,13 @@ class Neat:
         print('starting up on {} port {}'.format(*server_address))
         sock.bind(server_address)
 
+        print('\nwaiting to receive message')
+
         while True:
-            print('\nwaiting to receive message')
             data, address = sock.recvfrom(message_size)
             data = data.decode('utf-8')
             input_arr = data.split(' ')
-            cmd = input_arr[0]
+            cmd = input_arr[0].strip()
             params = input_arr[1:]
 
             # return population indexes
@@ -76,8 +77,16 @@ class Neat:
                 winner_net = self.create_net(self.population.population.get(int(params[0])))
                 inputs = [float(i) for i in params[1].split(',')]
                 self.send(sock, ' '.join([str(s) for s in winner_net.activate(inputs)]), address)
+            if 'fit' == cmd:
+                genome = self.population.population.get(int(params[0]))
+                genome.fitness = float(params[1])
+
+            if 'evo' == cmd:
+                winner = self.train(1)
+                self.send(sock, str(winner.key), address)
             else:
                 pass
 
     def send(self, sock, data, address):
+        print(data)
         return sock.sendto(data.encode('utf-8'), address)
